@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException, Response, status
 from pydantic import BaseModel
 
 app = FastAPI() #variable names for the server
@@ -31,7 +31,20 @@ class Product (BaseModel):
 
 
 @app.post("/products")
-async def create_post(payload: Product):
+async def create_post(payload: Product, response:Response):
     print(payload.productName)
     productsList.append(payload.dict())
+    response.status_code = status.HTTP_201_CREATED
     return {"message":f"New watch added sucessfully : {payload.productName}"} 
+
+
+@app.get("/products/{product_id}")
+async def get_product(product_id: int, response:Response):
+    try: 
+        corresponding_product = productsList[product_id - 1] #parce id commence à 1 et index commence à 0
+        return corresponding_product
+    except:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
