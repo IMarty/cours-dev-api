@@ -2,13 +2,13 @@ from typing import Optional
 from fastapi import FastAPI, Body, HTTPException, Response, status
 from pydantic import BaseModel
 
-api_description = description = """
-Watch API helps you do awesome stuff. 🚀
+# Description
+api_description = description = """ 
+Watch API helps you do awesome stuff. 
 
 ## Products
 
-You will be able to:
-
+You will be able to :
 * Create new product.
 * Get products list.
 """
@@ -16,10 +16,10 @@ You will be able to:
 # Liste des tags utilises dans la doc
 tags_metadata = [
     {
-        "name": "Products",
-        "description": "Manage Products. So _fancy_ they have their own docs.",
-        "externalDocs": {
-            "description": "Items external docs",
+        "name" : "Products",
+        "description" : " Manage Products. So _Fancy_ they have their own docs.",
+        "externalDocs" : {
+            "description" :"Items external docs",
             "url": "https://fastapi.tiangolo.com/",
         },
     },
@@ -29,9 +29,8 @@ tags_metadata = [
 app = FastAPI(
     title="Watch API",
     description=api_description,
-    openapi_tags=tags_metadata # tagsmetadata definit au dessus
-
-) #API metadata
+    openapi_tags=tags_metadata # tagsmetadat est defnit au dessus
+) #variable names for the server
 
 @app.get("/")
 async def root():
@@ -41,8 +40,6 @@ productsList = [
             {"productName":"Rolex Submariner", "productPrice":11130},
             {"productName":"Ulysse Nardin Dual Time", "productPrice":6015}
         ]
-
-# Tags metadata https://fastapi.tiangolo.com/tutorial/metadata/#metadata-for-tags
 
 @app.get("/products", tags=["Products"])
 async def getProducts():
@@ -66,7 +63,7 @@ async def create_post(payload: Product, response:Response):
     print(payload.productName)
     productsList.append(payload.dict())
     response.status_code = status.HTTP_201_CREATED
-    return {"message" : f"New watch added sucessfully : {payload.productName}"} 
+    return {"message":f"New watch added sucessfully : {payload.productName}"} 
 
 
 @app.get("/products/{product_id}", tags=["Products"])
@@ -79,29 +76,32 @@ async def get_product(product_id: int, response:Response):
             status.HTTP_404_NOT_FOUND,
             detail="Product not found"
         )
+    
+    # DELETE : base du endpoint
 
+    @app.delete("/products/{product_id}", tags=["Products"])
+    async def delete_product(product_id: int, response:Response): 
+        try: 
+            productsList.pop(product_id -1)
+            response.status_code = status.HTTP_204_NO_CONTENT
+            return
+        except:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                detail = "Prodcut not found"
+            )
 
-# DELETE : base du endpoint, puis montrer index -1, puis montrer plantage donc try
-@app.delete("/products/{product_id}", tags=["Products"])
-async def delete_product(product_id: int, response:Response):
-    try: 
-        productsList.pop(product_id -1) 
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return 
-    except:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
+#PUT (ajoputer mais sur exister -> remplacer)
 
-# PUT (ajouter mais sur exister -> remplacer)
 @app.put("/products/{product_id}", tags=["Products"])
-async def replace_product(product_id: int, payload: Product, response:Response):
+async def replace_product(product_id: int, payload: Product, response:Response ):
     try: 
         productsList[product_id - 1] = payload.dict()
-        return {"message" : f"Watch updated sucessfully : {payload.productName}"}
+        return {"message" : f"Watch updated successfully : {payload.productName}"}
     except:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
             detail="Product not found"
+
         )
+        
