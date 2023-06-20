@@ -32,6 +32,22 @@ app = FastAPI(
     openapi_tags=tags_metadata # tagsmetadata definit au dessus
 
 ) #API metadata
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+# Connexion DB
+connexion = psycopg2.connect(
+    host="dpg-ci8rn3h8g3nfuca2vvc0-a.frankfurt-postgres.render.com",
+    database="shop_wapi_render",
+    user="igor_render",
+    password="5lGQuN1kIVPqR4x6GD7a7Z7EpW9ja2GQ",
+    cursor_factory=RealDictCursor
+)
+cursor= connexion.cursor()
+
+
+
+app = FastAPI() #variable names for the server
 
 @app.get("/")
 async def root():
@@ -46,8 +62,11 @@ productsList = [
 
 @app.get("/products", tags=["Products"])
 async def getProducts():
+    # Requete SQL
+    cursor.execute("SELECT * FROM product")
+    dbProducts= cursor.fetchall()
     return {
-        "products": productsList,
+        "products": dbProducts,
         "limit": 10,
         "total": 2,
         "skip":0
@@ -57,14 +76,15 @@ async def getProducts():
 class Product (BaseModel):
     productName: str
     productPrice: float # datatypes : https://docs.pydantic.dev/latest/usage/types/
-    availability: bool = True # default / optionel
-    rating: Optional[int] # Completement optionnel
+    # availability: bool = True # default / optionel
+    # rating: Optional[int] # Completement optionnel
 
 
 @app.post("/products", tags=["Products"])
 async def create_post(payload: Product, response:Response):
     print(payload.productName)
-    productsList.append(payload.dict())
+    cursor.execute("INSERT INTO product (name, price) VALUES (%s,%s) RETURNING *;", (payload.productName, payload.productPrice))
+    connexion.commit() # Save in the DB (Comme F6 dans PGAdmin)
     response.status_code = status.HTTP_201_CREATED
     return {"message" : f"New watch added sucessfully : {payload.productName}"} 
 
@@ -72,8 +92,15 @@ async def create_post(payload: Product, response:Response):
 @app.get("/products/{product_id}", tags=["Products"])
 async def get_product(product_id: int, response:Response):
     try: 
-        corresponding_product = productsList[product_id - 1] #parce id commence à 1 et index commence à 0
-        return corresponding_product
+        cursor.execute(f"SELECT * FROM product WHERE id={product_id}")
+        corresponding_product = cursor.fetchone()
+        if (corresponding_product):
+            return corresponding_product
+        else:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                detail="Product not found"
+            )
     except:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
@@ -81,27 +108,24 @@ async def get_product(product_id: int, response:Response):
         )
 
 
-# DELETE : base du endpoint, puis montrer index -1, puis montrer plantage donc try
-@app.delete("/products/{product_id}", tags=["Products"])
-async def delete_product(product_id: int, response:Response):
-    try: 
-        productsList.pop(product_id -1) 
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return 
-    except:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
+@app.put("/products/{product_id}")
+async def update_product(product_id: int,payload: Product):
+    cursor.execute(
+        'UPDATE product SET name=%s, price=%s WHERE id=%s RETURNING *;',
+        (payload.productName, payload.productPrice, product_id )
+    )
+    # test= cursor.fetchone()
+    # print(test)
+    connexion.commit()
 
-# PUT (ajouter mais sur exister -> remplacer)
-@app.put("/products/{product_id}", tags=["Products"])
-async def replace_product(product_id: int, payload: Product, response:Response):
-    try: 
-        productsList[product_id - 1] = payload.dict()
-        return {"message" : f"Watch updated sucessfully : {payload.productName}"}
-    except:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
+    return {"message":f"Watch sucessfully updated: {payload.productName}"} 
+
+
+@app.delete('/products/{product_id}')
+async def delete_product(product_id:int):
+    cursor.execute(
+        "DELETE FROM product WHERE id=%s RETURNING *;",
+        (product_id,) # don't touch this code, it work and I don't know why
+    )
+    connexion.commit()
+    return {"message":f"Watch deleted updated"} 
