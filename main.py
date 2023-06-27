@@ -12,7 +12,7 @@ models.Base.metadata.create_all(bind=database_engine)
 app= FastAPI()
 
 
-
+# Read
 @app.get('/products')
 async def get_products(cursor: Session= Depends(get_cusor)):
     print(cursor.query(models.Products)) # Requète SQL générée
@@ -23,3 +23,8 @@ async def get_products(cursor: Session= Depends(get_cusor)):
         "total": 2,
         "skip":0
     }
+
+# Exercice :  @app.get('/products/{product_id}')
+# db.query(models.BlogPosts).filter(models.BlogPosts.id == blog_id).first()
+
+# CREATE / DELETE / UPDATE
