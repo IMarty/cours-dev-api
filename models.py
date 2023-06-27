@@ -9,5 +9,5 @@ class Products(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
     price = Column(Numeric, nullable=False)
-    featured = Column(Boolean, nullable=True, server_default='TRUE')
+    featured = Column(Boolean, nullable=True, server_default='FALSE')
     created_at= Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')
