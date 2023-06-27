@@ -11,3 +11,10 @@ class Products(Base):
     price = Column(Numeric, nullable=False)
     featured = Column(Boolean, nullable=True, server_default='FALSE')
     created_at= Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')
+
+class Customers(Base):
+    __tablename__="customer"
+    id = Column(Integer, primary_key=True, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    create_at= Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')    

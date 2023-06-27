@@ -5,11 +5,12 @@ from database import get_cursor
 import models_orm, schemas_dto
 
 router = APIRouter(
-    prefix='/products'
+    prefix='/products',
+    tags=['Products']
 )
 
 # Read
-@router.get('/products')
+@router.get('')
 async def get_products(cursor: Session= Depends(get_cursor)):
     print(cursor.query(models_orm.Products)) # Requète SQL générée
     all_products = cursor.query(models_orm.Products).all() # Lancement de la requête
@@ -25,7 +26,7 @@ async def get_products(cursor: Session= Depends(get_cursor)):
 # Connecter à votre propre Database URL
 
 # Read by id
-@router.get('/products/{product_id}')
+@router.get('/{product_id}')
 async def get_product(product_id:int, cursor:Session= Depends(get_cursor)):
     corresponding_product = cursor.query(models_orm.Products).filter(models_orm.Products.id == product_id).first()
     if(corresponding_product):  
@@ -37,7 +38,7 @@ async def get_product(product_id:int, cursor:Session= Depends(get_cursor)):
         )
 
 # CREATE / POST 
-@router.post('/products', status_code=status.HTTP_201_CREATED)
+@router.post('', status_code=status.HTTP_201_CREATED)
 async def create_product(payload: schemas_dto.Product_POST_Body, cursor:Session= Depends(get_cursor)):
     new_product = models_orm.Products(name=payload.productName, price=payload.productPrice) # build the insert
     cursor.add(new_product) # Send the query
@@ -46,7 +47,7 @@ async def create_product(payload: schemas_dto.Product_POST_Body, cursor:Session=
     return {"message" : f"New watch {new_product.name} added sucessfully with id: {new_product.id}"} 
 
 # DELETE ? 
-@router.delete('/products/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(product_id:int, cursor:Session=Depends(get_cursor)):
     # Recherche sur le produit existe ? 
     corresponding_product = cursor.query(models_orm.Products).filter(models_orm.Products.id == product_id)
@@ -62,7 +63,7 @@ async def delete_product(product_id:int, cursor:Session=Depends(get_cursor)):
         )
 
 # Update
-@router.patch('/products/{product_id}')
+@router.patch('/{product_id}')
 async def update_product(product_id: int, payload:schemas_dto.Product_PATCH_Body, cursor:Session=Depends(get_cursor)):
     # trouver le produit correspodant
     corresponding_product = cursor.query(models_orm.Products).filter(models_orm.Products.id == product_id)
