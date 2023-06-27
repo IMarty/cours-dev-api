@@ -8,7 +8,7 @@ database_engine = create_engine(DATABASE_URL)
 # equivalent à un "cursor"
 SessionTemplate = sessionmaker(bind=database_engine, autocommit=False, autoflush=False)
 
-def get_cusor():
+def get_cursor():
     db= SessionTemplate()
     try:
         yield db
