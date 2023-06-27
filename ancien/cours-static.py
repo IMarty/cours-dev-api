@@ -77,19 +77,19 @@ async def get_product(product_id: int, response:Response):
             detail="Product not found"
         )
     
-    # DELETE : base du endpoint
+# DELETE : base du endpoint
 
-    @app.delete("/products/{product_id}", tags=["Products"])
-    async def delete_product(product_id: int, response:Response): 
-        try: 
-            productsList.pop(product_id -1)
-            response.status_code = status.HTTP_204_NO_CONTENT
-            return
-        except:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                detail = "Prodcut not found"
-            )
+@app.delete("/products/{product_id}", tags=["Products"])
+async def delete_product(product_id: int, response:Response): 
+    try: 
+        productsList.pop(product_id -1)
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return
+    except:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail = "Prodcut not found"
+        )
 
 #PUT (ajoputer mais sur exister -> remplacer)
 
