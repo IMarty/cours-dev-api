@@ -26,5 +26,6 @@ async def get_products(cursor: Session= Depends(get_cusor)):
 
 # Exercice :  @app.get('/products/{product_id}')
 # db.query(models.BlogPosts).filter(models.BlogPosts.id == blog_id).first()
+# Connecter à votre propre Database URL
 
 # CREATE / DELETE / UPDATE
