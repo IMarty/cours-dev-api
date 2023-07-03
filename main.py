@@ -19,6 +19,12 @@ You will be able to:
 
 * Create new product.
 * Get products list.
+
+## Customer 
+You'll be able to signup and login
+
+## Transaction
+You'll be able to list and create transactions
 """
 
 # Liste des tags utilises dans la doc
@@ -35,11 +41,15 @@ tags_metadata = [
         "name": "Customers",
         "description": "Create and list customers of our API",
     },
+    {
+        "name": "Transactions",
+        "description": "Create and list customer's transactions",
+    },
 ]
 
 #Lancement de l'API
 app= FastAPI( 
-    title="Watch API",
+    title="Watches API",
     description=api_description,
     openapi_tags=tags_metadata # tagsmetadata definit au dessus
     )

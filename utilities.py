@@ -4,9 +4,8 @@ from jose import jwt, JWTError
 # Mise en place du bouton d'authentification
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth')
-
-
 pwd_context = CryptContext(schemes=["bcrypt"])
 
 #Used during the Signup operation
@@ -22,18 +21,22 @@ def verify_password(given_password, hashed_password):
 algo = "HS256"
 secret = "5ae48e781d227cabc077167f64005ff949922d586157d6ae07078fee3f3ad170"
 
+# Generate a JWT token used by /auth
 def generate_token(given_id:int):
     payload = {"customer_id": given_id}
     encoded_jwt = jwt.encode(payload, secret, algorithm=algo)
     print(encoded_jwt)
-    return encoded_jwt
+    return {
+        "access_token": encoded_jwt, # JWT
+        "token_type": "bearer"
+    }
 
-
+# Used to retreive the customer id stored in the JWT
 def decode_token(given_token:str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(given_token, secret, algorithms=algo)
         decoded_id = payload.get('customer_id')
-    except JWTError :
+    except JWTError : # if JWT no provided or without a valide signature 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED
         )   

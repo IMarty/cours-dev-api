@@ -1,8 +1,8 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from classes.database import get_cursor
-
 from classes import models_orm, schemas_dto
 
 router = APIRouter(
@@ -12,14 +12,16 @@ router = APIRouter(
 
 # Read
 @router.get('')
-async def get_products(cursor: Session= Depends(get_cursor)):
-    print(cursor.query(models_orm.Products)) # Requète SQL générée
-    all_products = cursor.query(models_orm.Products).all() # Lancement de la requête
+async def get_products(
+    cursor: Session= Depends(get_cursor), 
+    limit:int=10, offset:int=0):
+    all_products = cursor.query(models_orm.Products).limit(limit).offset(offset).all() # Lancement de la requête
+    products_count= cursor.query(func.count(models_orm.Products.id)).scalar()
     return {
         "products": all_products,
-        "limit": 10,
-        "total": 2,
-        "skip":0
+        "limit": limit,
+        "total": products_count,
+        "skip":offset
     }
 
 # Exercice :  @app.get('/products/{product_id}')

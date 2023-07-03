@@ -18,7 +18,7 @@ async def auth_customer(
         cursor: Session= Depends(database.get_cursor)
     ):
     print(payload.__dict__)
-    # 1. Recup les crédentials
+    # 1. Recup les crédentials (username car il provient du formulaire par default de FastAPI)
     corresponding_customer = cursor.query(models_orm.Customers).filter(models_orm.Customers.email == payload.username).first()
     # 2. Vérifier dans la DB si user exist
     if(not corresponding_customer):
@@ -39,7 +39,4 @@ async def auth_customer(
     # # 4. Génération du JWT
     token = utilities.generate_token(corresponding_customer.id)
     print(token)
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    return token

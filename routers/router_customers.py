@@ -15,14 +15,18 @@ async def create_customer(
     cursor: Session = Depends(database.get_cursor),
     ):
     try: 
-        hashed_password = utilities.hash_password(payload.customerPassword)
+        # 1. On ne stock pas le mot de pass "en claire" mais le hash
+        hashed_password = utilities.hash_password(payload.customerPassword) 
+        # 2. Creation d'un object ORM pour être injecté dans la DB 
         new_customer= models_orm.Customers(password=hashed_password, email= payload.customerEmail)
-        cursor.add(new_customer) # Send query
-        cursor.commit() # Save the staged changes
-        cursor.refresh(new_customer) # Pour obtenir l'identifiant
-        # return {'message':f'The customer has been created with the id: {new_customer.id}'}
+        # 3. Send query
+        cursor.add(new_customer) 
+        # 4. Save the staged changes
+        cursor.commit() 
+        # Pour obtenir l'identifiant
+        cursor.refresh(new_customer) 
         return new_customer # not a python dict -> donc il faut un mapping
-    except IntegrityError:
+    except IntegrityError: # Se déclanche si un utilisateur possède déjà la même email (unique=True)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists" 
@@ -33,6 +37,7 @@ async def get_all_customers(cursor: Session = Depends(database.get_cursor)):
     all_customers = cursor.query(models_orm.Customers).all()
     return all_customers
 
+# Exercice not an actual use case
 @router.get('/{customer_id}', response_model=schemas_dto.Customer_response)
 async def get_user_by_id(customer_id:int, cursor: Session = Depends(database.get_cursor)):
     corresponding_customer = cursor.query(models_orm.Customers).filter(models_orm.Customers.id == customer_id).first()
