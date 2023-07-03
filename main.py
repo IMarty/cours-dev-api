@@ -32,6 +32,10 @@ tags_metadata = [
             "url": "https://fastapi.tiangolo.com/",
         },
     },
+    {
+        "name": "Customers",
+        "description": "Create and list customers of our API",
+    },
 ]
 
 #Lancement de l'API

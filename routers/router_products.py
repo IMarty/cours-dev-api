@@ -26,7 +26,7 @@ async def get_products(cursor: Session= Depends(get_cursor)):
 # Connecter à votre propre Database URL
 
 # Read by id
-@router.get('/{product_id}')
+@router.get('/{product_id}', response_model=schemas_dto.Product_GETID_Response)
 async def get_product(product_id:int, cursor:Session= Depends(get_cursor)):
     corresponding_product = cursor.query(models_orm.Products).filter(models_orm.Products.id == product_id).first()
     if(corresponding_product):  
@@ -69,7 +69,7 @@ async def update_product(product_id: int, payload:schemas_dto.Product_PATCH_Body
     corresponding_product = cursor.query(models_orm.Products).filter(models_orm.Products.id == product_id)
     if(corresponding_product.first()):
         # mise à jour (quoi avec quelle valeur ?) Body -> DTO
-        corresponding_product.update({'featured':payload.newFeature})
+        corresponding_product.update({'featured':payload.newFeatured})
         cursor.commit()
         return corresponding_product.first()
     else: 

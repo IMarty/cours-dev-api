@@ -1,4 +1,4 @@
-from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String, Numeric
+from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 
 # Class de base pour créer les models
@@ -17,4 +17,11 @@ class Customers(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    create_at= Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')    
+    create_at= Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')  
+
+class Transactions(Base):
+    __tablename__="transaction"
+    id= Column(Integer, primary_key=True, nullable=False)
+    customer_id= Column(Integer, ForeignKey("customer.id", ondelete="RESTRICT"), nullable=False)  
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="RESTRICT"), nullable=False)
+    transaction_date=Column(TIMESTAMP(timezone=True), nullable=False, server_default="now()")
