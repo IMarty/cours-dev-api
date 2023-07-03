@@ -1,15 +1,14 @@
 
 from fastapi import FastAPI
 
-import models_orm # Import des ORM
-from database import database_engine # import du cursor/session de la DB
+import classes.models_orm # Import des ORM
+from classes.database import database_engine # import du cursor/session de la DB
 
 #Import des routers
-import router_products
-import router_customers
+import routers.router_products, routers.router_customers, routers.router_transactions
 
 # Créer les tables si elles ne sont pas présente dans la DB
-models_orm.Base.metadata.create_all(bind=database_engine)
+classes.models_orm.Base.metadata.create_all(bind=database_engine)
 
 api_description = description = """
 Watch API helps you do awesome stuff. 🚀
@@ -46,5 +45,6 @@ app= FastAPI(
     )
 
 # Ajouter les routers dédiés
-app.include_router(router_products.router)
-app.include_router(router_customers.router)
+app.include_router(routers.router_products.router)
+app.include_router(routers.router_customers.router)
+app.include_router(routers.router_transactions.router)

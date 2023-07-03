@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-import models_orm, schemas_dto, database, utilities
+from classes import models_orm, schemas_dto, database
+import utilities
 
 router = APIRouter(
     prefix='/customers',
