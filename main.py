@@ -5,7 +5,7 @@ import classes.models_orm # Import des ORM
 from classes.database import database_engine # import du cursor/session de la DB
 
 #Import des routers
-import routers.router_products, routers.router_customers, routers.router_transactions
+import routers.router_products, routers.router_customers, routers.router_transactions, routers.router_auth
 
 # Créer les tables si elles ne sont pas présente dans la DB
 classes.models_orm.Base.metadata.create_all(bind=database_engine)
@@ -48,3 +48,4 @@ app= FastAPI(
 app.include_router(routers.router_products.router)
 app.include_router(routers.router_customers.router)
 app.include_router(routers.router_transactions.router)
+app.include_router(routers.router_auth.router)
