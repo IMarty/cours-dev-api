@@ -30,3 +30,4 @@ class Customer_response (BaseModel):
     # not sending the password
     class Config: # Importante pour la traduction ORM -> DTO
         orm_mode= True      
+        

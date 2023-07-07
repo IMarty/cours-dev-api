@@ -34,7 +34,7 @@ def generate_token(given_id:int):
 # Used to retreive the customer id stored in the JWT
 def decode_token(given_token:str = Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(given_token, secret, algorithms=algo)
+        payload = jwt.decode(given_token, secret, algorithms=algo) # Vérifie si la signature du JWT (en blue) est valide ou non
         decoded_id = payload.get('customer_id')
     except JWTError : # if JWT no provided or without a valide signature 
         raise HTTPException(
